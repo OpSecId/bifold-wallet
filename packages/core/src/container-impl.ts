@@ -116,11 +116,17 @@ export class MainContainer implements Container {
   private _container: DependencyContainer
   private log?: BifoldLogger
   private storage: PersistentStorage<PersistentState>
+  private enableOpenIDCredentialRefresh: boolean
 
-  public constructor(container: DependencyContainer, log?: BifoldLogger) {
+  public constructor(
+    container: DependencyContainer,
+    log?: BifoldLogger,
+    options?: { enableOpenIDCredentialRefresh?: boolean }
+  ) {
     this._container = container
     this.log = log
     this.storage = new PersistentStorage(log)
+    this.enableOpenIDCredentialRefresh = options?.enableOpenIDCredentialRefresh ?? true
   }
 
   public get container(): DependencyContainer {
@@ -245,30 +251,40 @@ export class MainContainer implements Container {
 
     this._container.registerInstance(TOKENS.UTIL_AGENT_BRIDGE, new AgentBridge())
 
-    // Register OpenID Credentials Refresh Orchestrator
-    const orchestrator: IRefreshOrchestrator = new RefreshOrchestrator(
-      this._container.resolve(TOKENS.UTIL_LOGGER),
-      this._container.resolve(TOKENS.UTIL_AGENT_BRIDGE) as AgentBridge,
-      {
-        autoStart: false,
-        runOnStart: true,
-        intervalMs: undefined,
-        flowType: OpenIDCredentialRefreshFlowType.FullReplacement,
-        listRecords: async () => {
-          const agent = (this._container.resolve(TOKENS.UTIL_AGENT_BRIDGE) as AgentBridge).current
-          if (!agent) return []
-          const [w3c, w3cV2, sdjwt, mdoc] = await Promise.all([
-            agent.w3cCredentials.getAll(),
-            agent.w3cV2Credentials.getAll(),
-            agent.sdJwtVc.getAll(),
-            agent.mdoc.getAll(),
-          ])
-          return [...w3c, ...w3cV2, ...sdjwt, ...mdoc]
-        },
+    if (this.enableOpenIDCredentialRefresh) {
+      const orchestrator: IRefreshOrchestrator = new RefreshOrchestrator(
+        this._container.resolve(TOKENS.UTIL_LOGGER),
+        this._container.resolve(TOKENS.UTIL_AGENT_BRIDGE) as AgentBridge,
+        {
+          autoStart: false,
+          runOnStart: true,
+          intervalMs: undefined,
+          flowType: OpenIDCredentialRefreshFlowType.FullReplacement,
+          listRecords: async () => {
+            const agent = (this._container.resolve(TOKENS.UTIL_AGENT_BRIDGE) as AgentBridge).current
+            if (!agent) return []
+            const [w3c, w3cV2, sdjwt, mdoc] = await Promise.all([
+              agent.w3cCredentials.getAll(),
+              agent.w3cV2Credentials.getAll(),
+              agent.sdJwtVc.getAll(),
+              agent.mdoc.getAll(),
+            ])
+            return [...w3c, ...w3cV2, ...sdjwt, ...mdoc]
+          },
+        }
+      )
+      this._container.registerInstance(TOKENS.UTIL_REFRESH_ORCHESTRATOR, orchestrator)
+    } else {
+      const noopOrchestrator: IRefreshOrchestrator = {
+        configure: () => undefined,
+        start: () => undefined,
+        stop: () => undefined,
+        runOnce: async () => undefined,
+        isRunning: () => false,
+        resolveFull: () => undefined,
       }
-    )
-
-    this._container.registerInstance(TOKENS.UTIL_REFRESH_ORCHESTRATOR, orchestrator)
+      this._container.registerInstance(TOKENS.UTIL_REFRESH_ORCHESTRATOR, noopOrchestrator)
+    }
 
     this._container.registerInstance(TOKENS.FN_PIN_HASH_ALGORITHM, (PIN: string, salt: string) => {
       return hashPIN(PIN, salt)

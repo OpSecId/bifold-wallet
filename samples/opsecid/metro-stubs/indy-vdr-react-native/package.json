@@ -1,0 +1,6 @@
+{
+  "name": "@hyperledger/indy-vdr-react-native",
+  "version": "0.0.0",
+  "private": true,
+  "main": "index.js"
+}

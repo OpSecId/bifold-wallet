@@ -1,0 +1,20 @@
+pluginManagement { includeBuild("../node_modules/@react-native/gradle-plugin") }
+plugins { id("com.facebook.react.settings") }
+extensions.configure(com.facebook.react.ReactSettingsExtension){ ex -> ex.autolinkLibrariesFromCommand() }
+
+rootProject.name = 'OpSecIdWallet'
+
+include ':app'
+includeBuild('../node_modules/@react-native/gradle-plugin')
+
+// Resolve Expo by path instead of spawning `node` at configuration time.
+// Process.execute() here prevents Gradle configuration-cache hits.
+def expoPackageJson = [
+    file("${rootDir}/../node_modules/expo/package.json"),
+    file("${rootDir}/../../../node_modules/expo/package.json"),
+].find { it.exists() }
+if (expoPackageJson == null) {
+    throw new GradleException("Could not find expo/package.json for autolinking")
+}
+apply from: new File(expoPackageJson.parentFile, "scripts/autolinking.gradle")
+useExpoModules()

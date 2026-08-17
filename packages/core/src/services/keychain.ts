@@ -35,15 +35,17 @@ export const optionsForKeychainAccess = (service: KeychainServices, useBiometric
 
   if (useBiometrics) {
     opts.accessControl = ACCESS_CONTROL.BIOMETRY_ANY
+    opts.authenticationPrompt = {
+      title: 'Unlock',
+      description: 'Authenticate to continue',
+    }
   }
 
   if (Platform.OS === 'android') {
     opts.securityLevel = SECURITY_LEVEL.ANY
-    if (!useBiometrics) {
-      opts.storage = STORAGE_TYPE.AES_GCM_NO_AUTH
-    } else {
-      opts.storage = STORAGE_TYPE.RSA
-    }
+    // AES_GCM + biometrics. RSA (the previous biometric storage) crashes on
+    // many Android 12+ devices when the key is first created or rotated.
+    opts.storage = useBiometrics ? STORAGE_TYPE.AES_GCM : STORAGE_TYPE.AES_GCM_NO_AUTH
   }
 
   return opts
@@ -65,15 +67,18 @@ export const secretForPIN = async (
   return secret
 }
 
-export const wipeWalletKey = async (useBiometrics: boolean) => {
-  const opts = optionsForKeychainAccess(KeychainServices.Key, useBiometrics)
-  await Keychain.resetGenericPassword(opts)
+export const wipeWalletKey = async (_useBiometrics?: boolean) => {
+  try {
+    await Keychain.resetGenericPassword({ service: KeychainServices.Key })
+  } catch {
+    // Nothing stored yet, or the previous cipher (RSA vs AES) does not match.
+  }
 }
 
 export const storeWalletKey = async (secret: WalletKey, useBiometrics = false): Promise<boolean> => {
   const opts = optionsForKeychainAccess(KeychainServices.Key, useBiometrics)
   const secretAsString = JSON.stringify(secret)
-  await wipeWalletKey(useBiometrics)
+  await wipeWalletKey()
   const result = await Keychain.setGenericPassword(keyFauxUserName, secretAsString, opts)
   return Boolean(result)
 }

@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpSecId Ridge — mobile design system</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0B0B0F;
+      --slate: #16161C;
+      --graphite: #1C1C24;
+      --steel: #2A2A32;
+      --signal: #F89038;
+      --signal-muted: #C46E28;
+      --core: #A8B8B8;
+      --fog: #8E8E93;
+      --mist: #C7C7CC;
+      --paper: #F5F5F7;
+      --fault: #FF453A;
+      --live: #30D158;
+      --hairline: rgba(245, 245, 247, 0.08);
+      --gutter: 20px;
+      --r-card: 20px;
+      --r-ctrl: 16px;
+      --phone-w: 360px;
+      --phone-h: 760px;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--ink); color: var(--paper); font-family: Outfit, system-ui, sans-serif; }
+    body { min-height: 100vh; }
+    a { color: var(--signal); text-decoration: none; }
+    .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+
+    header.mast {
+      padding: 28px 32px 12px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      border-bottom: 1px solid var(--hairline);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .brand img { width: 48px; height: 48px; }
+    .brand h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.4px;
+    }
+    .brand p {
+      margin: 2px 0 0;
+      color: var(--fog);
+      font-size: 13px;
+    }
+    .meta {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--core);
+      text-align: right;
+    }
+
+    nav.toc {
+      display: flex;
+      gap: 8px;
+      padding: 16px 32px;
+      position: sticky;
+      top: 0;
+      background: rgba(11,11,15,0.92);
+      z-index: 4;
+      border-bottom: 1px solid var(--hairline);
+    }
+    nav.toc a {
+      color: var(--fog);
+      font-size: 13px;
+      font-weight: 500;
+      padding: 8px 12px;
+      border-radius: 999px;
+    }
+    nav.toc a:hover, nav.toc a:focus-visible { color: var(--paper); background: var(--steel); outline: none; }
+
+    section { padding: 36px 32px; }
+    section h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+    }
+    .lede { color: var(--fog); max-width: 62ch; margin: 0 0 28px; line-height: 1.5; font-size: 15px; }
+
+    .swatches { display: flex; flex-wrap: wrap; gap: 12px; }
+    .swatch {
+      width: 132px;
+      background: var(--slate);
+      border: 1px solid var(--hairline);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .swatch .chip { height: 64px; }
+    .swatch figcaption { padding: 10px 12px 12px; }
+    .swatch strong { display: block; font-size: 13px; font-weight: 500; }
+    .swatch code { font-family: "IBM Plex Mono", monospace; font-size: 11px; color: var(--fog); }
+
+    .type-row {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 16px;
+      padding: 16px 0;
+      border-top: 1px solid var(--hairline);
+      align-items: baseline;
+    }
+    .type-row .role { font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--core); }
+    .t-display { font-size: 28px; font-weight: 600; letter-spacing: -0.5px; }
+    .t-title { font-size: 22px; font-weight: 600; letter-spacing: -0.3px; }
+    .t-body { font-size: 16px; line-height: 22px; }
+    .t-caption { font-size: 13px; color: var(--fog); }
+    .t-label { font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--core); }
+
+    .rules {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+    .rule {
+      background: var(--slate);
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-card);
+      padding: 18px 18px 16px;
+    }
+    .rule h3 { margin: 0 0 8px; font-size: 15px; font-weight: 600; }
+    .rule p { margin: 0; color: var(--fog); font-size: 14px; line-height: 1.45; }
+
+    .film {
+      display: flex;
+      gap: 28px;
+      overflow-x: auto;
+      padding: 8px 4px 28px;
+      scroll-snap-type: x mandatory;
+    }
+    .shot { scroll-snap-align: start; flex: 0 0 auto; }
+    .shot .caption {
+      margin: 10px 0 0;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 11px;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--core);
+      text-align: center;
+    }
+
+    .phone {
+      width: var(--phone-w);
+      height: var(--phone-h);
+      background: var(--ink);
+      border: 1px solid var(--hairline);
+      border-radius: 36px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+      display: flex;
+      flex-direction: column;
+    }
+    .status {
+      height: 44px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      padding: 0 22px 8px;
+      font-size: 13px;
+      font-weight: 600;
+      flex: none;
+    }
+    .screen { flex: 1; display: flex; flex-direction: column; padding: 8px var(--gutter) 0; min-height: 0; }
+    .row { display: flex; align-items: center; justify-content: space-between; }
+    .grow { flex: 1; min-height: 0; }
+
+    .node {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--signal); display: inline-block;
+    }
+
+    .card {
+      background: var(--graphite);
+      border: 1px solid var(--hairline);
+      border-radius: var(--r-card);
+      padding: 18px;
+      position: relative;
+    }
+    .card.tall { min-height: 128px; }
+    .card .node {
+      position: absolute; top: 14px; right: 14px;
+    }
+
+    .btn {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 52px; border-radius: var(--r-ctrl); font-weight: 600; font-size: 16px;
+      border: 0; width: 100%; cursor: default;
+    }
+    .btn.primary { background: var(--signal); color: var(--ink); }
+    .btn.secondary { background: var(--steel); color: var(--paper); }
+    .btn.ghost { background: transparent; color: var(--paper); }
+    .btn.danger { background: var(--fault); color: var(--paper); }
+
+    .dock {
+      flex: none;
+      background: var(--slate);
+      padding: 10px 24px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+    }
+    .dock .tab { color: var(--fog); font-size: 14px; font-weight: 600; }
+    .dock .tab.on { color: var(--signal); }
+    .scan {
+      width: 72px; height: 72px; border-radius: 36px;
+      background: var(--signal); color: var(--ink);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 14px;
+      margin-top: -28px;
+    }
+
+    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: auto; padding-bottom: 12px; }
+    .key {
+      aspect-ratio: 1.5;
+      background: var(--steel);
+      border-radius: 18px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 500;
+    }
+    .key.empty { background: transparent; }
+    .pin {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: 28px; letter-spacing: 10px; text-align: center;
+      margin: 28px 0 8px;
+    }
+
+    .viewfinder {
+      flex: 1; margin: 12px 0 20px; border-radius: 20px;
+      background: #050507;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .frame {
+      width: 210px; height: 210px; border-radius: 20px;
+      border: 2px solid var(--signal);
+    }
+
+    .attr { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--hairline); font-size: 14px; }
+    .attr span:last-child { color: var(--fog); font-family: "IBM Plex Mono", monospace; font-size: 12px; }
+
+    .specimen {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .specimen .card { min-height: 0; }
+
+    .rail {
+      height: 3px; border-radius: 999px; background: var(--steel); overflow: hidden; width: 100%;
+    }
+    .rail > i {
+      display: block; height: 100%; width: 8%; background: var(--signal); border-radius: 999px;
+      animation: rail 3.4s cubic-bezier(0.2, 0.9, 0.2, 1) forwards;
+    }
+    @keyframes rail {
+      0% { width: 8%; }
+      40% { width: 72%; }
+      100% { width: 88%; }
+    }
+    .pulse-row { display: flex; gap: 14px; justify-content: center; height: 36px; align-items: center; }
+    .pulse-row i {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--signal);
+      animation: nodepulse 0.9s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+    }
+    .pulse-row i:nth-child(2) { animation-delay: 0.14s; }
+    .pulse-row i:nth-child(3) { animation-delay: 0.28s; }
+    @keyframes nodepulse {
+      from { opacity: 0.28; transform: scale(0.7); }
+      to { opacity: 1; transform: scale(1.15); }
+    }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .durations { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
+    .durations .rule code { color: var(--core); font-family: "IBM Plex Mono", monospace; font-size: 12px; }
+
+    footer.note {
+      padding: 12px 32px 40px;
+      color: var(--fog);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <header class="mast">
+    <div class="brand">
+      <img src="../branding/opsecid-icon.png" alt="OpSecId fingerprint mark" />
+      <div>
+        <h1>Ridge</h1>
+        <p>Mobile design system for OpSecId Wallet</p>
+      </div>
+    </div>
+    <div class="meta">iOS · Android · 390pt<br />Signal #F89038</div>
+  </header>
+
+  <nav class="toc">
+    <a href="#intent">Intent</a>
+    <a href="#color">Color</a>
+    <a href="#type">Type</a>
+    <a href="#voice">Voice</a>
+    <a href="#motion">Motion</a>
+    <a href="#screens">Screens</a>
+    <a href="#components">Components</a>
+  </nav>
+
+  <section id="intent">
+    <h2>Intent</h2>
+    <p class="lede">
+      Ridge is a holder UI, not a marketing site. The person on the other side of the glass
+      is unlocking a credential, scanning a QR, or sharing a proof. Surfaces stay matte and
+      quiet — anodized metal, not glass. Orange is an action, never decoration.
+    </p>
+    <div class="rules">
+      <article class="rule">
+        <h3>Signal is scarce</h3>
+        <p>Use orange only for the primary action, the Scan node, and a verified contact. If everything is orange, nothing is urgent.</p>
+      </article>
+      <article class="rule">
+        <h3>Core labels data</h3>
+        <p>The muted sage from the fingerprint core is for meta labels: CREDENTIAL OFFER, VERSION, PIN. Never for buttons.</p>
+      </article>
+      <article class="rule">
+        <h3>One signature: the node</h3>
+        <p>A 6px Signal dot is the circuit contact from the mark. It means “this is live / verified.” The Scan control is the same idea at 72px.</p>
+      </article>
+      <article class="rule">
+        <h3>Rounded, not soft</h3>
+        <p>Cards 20, controls 16. Hairline inner edge, no drop shadow. Depth comes from graphite on ink, not glow.</p>
+      </article>
+      <article class="rule">
+        <h3>Wait in motion</h3>
+        <p>DIDComm is slow. The UI is not. Three Signal nodes pulse while the agent works. Never a frozen spinner.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="color">
+    <h2>Color</h2>
+    <p class="lede">Near-black field, grey metal stacks, OpSecId orange sampled from the official icon.</p>
+    <div class="swatches">
+      <figure class="swatch"><div class="chip" style="background:#0B0B0F"></div><figcaption><strong>Ink</strong><code>#0B0B0F</code></figcaption></figure>
+      <figure class="swatch"><div class="chip" style="background:#16161C"></div><figcaption><strong>Slate</strong><code>#16161C</code></figcaption></figure>
+      <figure class="swatch"><div class="chip" style="background:#1C1C24"></div><figcaption><strong>Graphite</strong><code>#1C1C24</code></figcaption></figure>
+      <figure class="swatch"><div class="chip" style="background:#2A2A32"></div><figcaption><strong>Steel</strong><code>#2A2A32</code></figcaption></figure>
+      <figure class="swatch"><div class="chip" style="background:#F89038"></div><figcaption><strong>Signal</strong><code>#F89038</code></figcaption></figure>
+      <figure class="swatch"><div class="chip" style="background:#A8B8B8"></div><figcaption><strong>Core</strong><code>#A8B8B8</code></figcaption></figure>
+      <figure class="swatch"><div class="chip" style="background:#8E8E93"></div><figcaption><strong>Fog</strong><code>#8E8E93</code></figcaption></figure>
+      <figure class="swatch"><div class="chip" style="background:#F5F5F7"></div><figcaption><strong>Paper</strong><code>#F5F5F7</code></figcaption></figure>
+      <figure class="swatch"><div class="chip" style="background:#FF453A"></div><figcaption><strong>Fault</strong><code>#FF453A</code></figcaption></figure>
+      <figure class="swatch"><div class="chip" style="background:#30D158"></div><figcaption><strong>Live</strong><code>#30D158</code></figcaption></figure>
+    </div>
+  </section>
+
+  <section id="type">
+    <h2>Type</h2>
+    <p class="lede">Outfit for everything a person reads as UI. IBM Plex Mono for anything that is a secret, an identifier, or a machine value.</p>
+    <div class="type-row"><div class="role">Display</div><div class="t-display">OpSecId Wallet</div></div>
+    <div class="type-row"><div class="role">Title</div><div class="t-title">Nothing pending</div></div>
+    <div class="type-row"><div class="role">Body</div><div class="t-body">Scan a QR code to receive a credential or share a proof.</div></div>
+    <div class="type-row"><div class="role">Caption</div><div class="t-caption">Version 1.0 (1)</div></div>
+    <div class="type-row"><div class="role">Label</div><div class="t-label">Credential offer</div></div>
+    <div class="type-row"><div class="role">PIN</div><div class="mono" style="font-size:28px;letter-spacing:10px">● ● ● ○ ○ ○</div></div>
+  </section>
+
+  <section id="voice">
+    <h2>Voice</h2>
+    <p class="lede">Sentence case. Name the thing the person is doing. Errors say what failed and what to do next. Empty states invite an action.</p>
+    <div class="rules">
+      <article class="rule">
+        <h3>Do</h3>
+        <p>Scan to get started. Accept credential. Unlock failed — try again. No cards yet.</p>
+      </article>
+      <article class="rule">
+        <h3>Don’t</h3>
+        <p>Welcome to your secure digital identity journey. Submit. Oops, something went wrong.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="motion">
+    <h2>Motion</h2>
+    <p class="lede">
+      Feedback is faster than the network. A tap scales in 90ms. Screens rise 18pt in 220ms.
+      While DIDComm talks to a mediator, three Signal nodes pulse so the pause never feels stuck.
+      Perceived progress runs ahead, then crawls until the record lands.
+    </p>
+    <div class="durations" style="margin-bottom:28px">
+      <article class="rule"><h3>Instant 90ms</h3><p>Press scale 0.97. Keypad. Scan node spring.</p><p><code>ease-out 0.2 0.9 0.2 1</code></p></article>
+      <article class="rule"><h3>Fast 140ms</h3><p>Dismiss, tab mark, button release.</p><p><code>motion.fast</code></p></article>
+      <article class="rule"><h3>Base 220ms</h3><p>Push, cover sheet, list enter + 42ms stagger.</p><p><code>motion.base</code></p></article>
+      <article class="rule"><h3>Hold 900ms</h3><p>Node pulse loop. Never a system spinner.</p><p><code>motion.hold</code></p></article>
+    </div>
+    <div class="film">
+      <div class="shot">
+        <div class="phone">
+          <div class="status"><span>9:41</span><span class="mono" style="font-size:11px;color:var(--fog)">LTE</span></div>
+          <div class="screen" style="justify-content:center;gap:28px;padding-bottom:48px">
+            <div class="pulse-row"><i></i><i></i><i></i></div>
+            <div style="text-align:center">
+              <p class="t-label" style="margin:0">Working</p>
+              <h2 class="t-display" style="margin:8px 0 0">Connecting</h2>
+              <p class="t-caption" style="margin:8px auto 0;max-width:28ch">Waiting on the other agent. This can take a moment.</p>
+            </div>
+            <div class="rail"><i></i></div>
+            <div class="btn ghost">Cancel</div>
+          </div>
+        </div>
+        <p class="caption">DIDComm wait</p>
+      </div>
+      <div class="shot">
+        <div class="phone">
+          <div class="status"><span>9:41</span><span class="mono" style="font-size:11px;color:var(--fog)">LTE</span></div>
+          <div class="screen">
+            <div class="row">
+              <h2 class="t-display" style="margin:0">Home</h2>
+              <span style="color:var(--signal);font-weight:500;font-size:16px">Settings</span>
+            </div>
+            <div class="card" style="margin-top:20px;animation: rise 0.22s cubic-bezier(0.2, 0.9, 0.2, 1) both">
+              <span class="node"></span>
+              <p class="t-label" style="margin:0">Credential offer</p>
+              <h3 class="t-title" style="margin:8px 0 0">Student ID</h3>
+              <p class="t-caption" style="margin:8px 0 0">Tap to review</p>
+            </div>
+            <div class="card" style="margin-top:12px;animation: rise 0.22s 0.042s cubic-bezier(0.2, 0.9, 0.2, 1) both">
+              <p class="t-label" style="margin:0">Proof request</p>
+              <h3 class="t-title" style="margin:8px 0 0">Share information</h3>
+              <p class="t-caption" style="margin:8px 0 0">Tap to review</p>
+            </div>
+          </div>
+          <div class="dock">
+            <span class="tab on">Home</span>
+            <div class="scan">Scan</div>
+            <span class="tab">Cards</span>
+          </div>
+        </div>
+        <p class="caption">List enter</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="screens">
+    <h2>Screens</h2>
+    <p class="lede">Home / Scan / Cards is the product. Everything else is a sheet off that dock.</p>
+    <div class="film">
+
+      <div class="shot">
+        <div class="phone">
+          <div class="status"><span>9:41</span><span class="mono" style="font-size:11px;color:var(--fog)">LTE</span></div>
+          <div class="screen">
+            <p class="t-label" style="margin:8px 0 0">Unlock</p>
+            <h2 class="t-display" style="margin:8px 0 0">Enter PIN</h2>
+            <p class="t-caption" style="margin:8px 0 0">This wallet stays on this device.</p>
+            <div class="pin">● ● ● ○ ○ ○</div>
+            <div class="keypad">
+              <div class="key">1</div><div class="key">2</div><div class="key">3</div>
+              <div class="key">4</div><div class="key">5</div><div class="key">6</div>
+              <div class="key">7</div><div class="key">8</div><div class="key">9</div>
+              <div class="key empty"></div><div class="key">0</div><div class="key">⌫</div>
+            </div>
+          </div>
+        </div>
+        <p class="caption">Unlock</p>
+      </div>
+
+      <div class="shot">
+        <div class="phone">
+          <div class="status"><span>9:41</span><span class="mono" style="font-size:11px;color:var(--fog)">LTE</span></div>
+          <div class="screen">
+            <div class="row">
+              <h2 class="t-display" style="margin:0">Home</h2>
+              <span style="color:var(--signal);font-weight:500;font-size:16px">Settings</span>
+            </div>
+            <div class="grow" style="display:flex;flex-direction:column;justify-content:center;padding-bottom:24px">
+              <h3 class="t-title" style="margin:0">Nothing pending</h3>
+              <p class="t-caption" style="margin:8px 0 0;max-width:28ch">Scan a QR code to receive a credential or share a proof.</p>
+            </div>
+          </div>
+          <div class="dock">
+            <span class="tab on">Home</span>
+            <div class="scan">Scan</div>
+            <span class="tab">Cards</span>
+          </div>
+        </div>
+        <p class="caption">Home · empty</p>
+      </div>
+
+      <div class="shot">
+        <div class="phone">
+          <div class="status"><span>9:41</span><span class="mono" style="font-size:11px;color:var(--fog)">LTE</span></div>
+          <div class="screen">
+            <div class="row">
+              <h2 class="t-display" style="margin:0">Home</h2>
+              <span style="color:var(--signal);font-weight:500;font-size:16px">Settings</span>
+            </div>
+            <div class="card" style="margin-top:20px">
+              <span class="node" title="Needs action"></span>
+              <p class="t-label" style="margin:0">Credential offer</p>
+              <h3 class="t-title" style="margin:8px 0 0">Student ID</h3>
+              <p class="t-caption" style="margin:8px 0 0">Tap to review</p>
+            </div>
+            <div class="card" style="margin-top:12px">
+              <p class="t-label" style="margin:0">Proof request</p>
+              <h3 class="t-title" style="margin:8px 0 0">Share information</h3>
+              <p class="t-caption" style="margin:8px 0 0">Tap to review</p>
+            </div>
+          </div>
+          <div class="dock">
+            <span class="tab on">Home</span>
+            <div class="scan">Scan</div>
+            <span class="tab">Cards</span>
+          </div>
+        </div>
+        <p class="caption">Home · inbox</p>
+      </div>
+
+      <div class="shot">
+        <div class="phone">
+          <div class="status"><span>9:41</span><span class="mono" style="font-size:11px;color:var(--fog)">LTE</span></div>
+          <div class="screen">
+            <h2 class="t-display" style="margin:0 0 16px">Cards</h2>
+            <div class="card tall">
+              <span class="node"></span>
+              <p class="t-label" style="margin:0">Credential</p>
+              <h3 class="t-title" style="margin:14px 0 0">Bachelor of Science</h3>
+              <p class="t-caption" style="margin:8px 0 0">University of Wyoming</p>
+            </div>
+            <div class="card tall" style="margin-top:12px;background:var(--steel)">
+              <p class="t-label" style="margin:0">Credential</p>
+              <h3 class="t-title" style="margin:14px 0 0">Student ID</h3>
+              <p class="t-caption" style="margin:8px 0 0">Valid through 2027</p>
+            </div>
+          </div>
+          <div class="dock">
+            <span class="tab">Home</span>
+            <div class="scan">Scan</div>
+            <span class="tab on">Cards</span>
+          </div>
+        </div>
+        <p class="caption">Cards</p>
+      </div>
+
+      <div class="shot">
+        <div class="phone">
+          <div class="status"><span>9:41</span><span class="mono" style="font-size:11px;color:var(--fog)">LTE</span></div>
+          <div class="screen" style="background:#050507">
+            <p style="color:var(--signal);margin:4px 0 12px;font-weight:500">Close</p>
+            <h2 class="t-display" style="margin:0">Scan</h2>
+            <p class="t-caption" style="margin:8px 0 0">Point the camera at a credential or proof QR code.</p>
+            <div class="viewfinder"><div class="frame"></div></div>
+          </div>
+        </div>
+        <p class="caption">Scan</p>
+      </div>
+
+      <div class="shot">
+        <div class="phone">
+          <div class="status"><span>9:41</span><span class="mono" style="font-size:11px;color:var(--fog)">LTE</span></div>
+          <div class="screen">
+            <p class="t-label" style="margin:4px 0 0">Offer</p>
+            <h2 class="t-display" style="margin:8px 0 0">Student ID</h2>
+            <p class="t-caption" style="margin:8px 0 16px">From University of Wyoming</p>
+            <div class="card">
+              <div class="attr" style="border-top:0;padding-top:0"><span>Name</span><span>Kaylee</span></div>
+              <div class="attr"><span>Student number</span><span>WYO-20418</span></div>
+              <div class="attr"><span>Program</span><span>Computer Science</span></div>
+            </div>
+            <div style="margin-top:auto;padding:16px 0 20px;display:flex;flex-direction:column;gap:10px">
+              <div class="btn primary">Accept credential</div>
+              <div class="btn ghost">Decline</div>
+            </div>
+          </div>
+        </div>
+        <p class="caption">Offer</p>
+      </div>
+
+      <div class="shot">
+        <div class="phone">
+          <div class="status"><span>9:41</span><span class="mono" style="font-size:11px;color:var(--fog)">LTE</span></div>
+          <div class="screen">
+            <h2 class="t-display" style="margin:0 0 16px">Settings</h2>
+            <div class="card">
+              <div class="row"><div><div>PIN</div><p class="t-caption" style="margin:4px 0 0">Change your unlock PIN</p></div><span style="color:var(--signal)">Edit</span></div>
+            </div>
+            <div class="card" style="margin-top:10px">
+              <div class="row"><div><div>Biometrics</div><p class="t-caption" style="margin:4px 0 0">On</p></div><span style="color:var(--signal)">Edit</span></div>
+            </div>
+            <div class="card" style="margin-top:10px">
+              <div class="row"><div><div>Auto-lock</div><p class="t-caption" style="margin:4px 0 0">5 min</p></div><span style="color:var(--signal)">Edit</span></div>
+            </div>
+            <div class="btn secondary" style="margin-top:16px">Lock wallet</div>
+            <p class="t-caption" style="margin:16px 0 0">Version 1.0 (1)</p>
+          </div>
+        </div>
+        <p class="caption">Settings</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="components">
+    <h2>Components</h2>
+    <p class="lede">Primary is Signal on Ink. Secondary is Steel. Ghost has no fill. Fault is for irreversible decline only.</p>
+    <div class="specimen">
+      <div class="card">
+        <p class="t-label" style="margin:0 0 12px">Buttons</p>
+        <div class="btn primary">Accept credential</div>
+        <div class="btn secondary" style="margin-top:8px">Lock wallet</div>
+        <div class="btn ghost" style="margin-top:8px">Decline</div>
+      </div>
+      <div class="card">
+        <span class="node"></span>
+        <p class="t-label" style="margin:0">Credential offer</p>
+        <h3 class="t-title" style="margin:8px 0 0">New credential</h3>
+        <p class="t-caption" style="margin:8px 0 0">Tap to review</p>
+      </div>
+      <div class="card">
+        <p class="t-label" style="margin:0 0 12px">Dock</p>
+        <p class="t-caption" style="margin:0 0 16px">Home and Cards are text. Scan is the only round control, and it sits above the bar.</p>
+        <div class="dock" style="border-radius:16px;margin:0 -4px">
+          <span class="tab on">Home</span>
+          <div class="scan" style="margin-top:0">Scan</div>
+          <span class="tab">Cards</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="note">
+    Ridge tokens live in <span class="mono">src/design/tokens.ts</span>.
+    This gallery is the visual spec — open the file in a browser, or import
+    <span class="mono">design-system/tokens.json</span> into Claude Design.
+  </footer>
+</body>
+</html>

@@ -70,6 +70,7 @@ export default [
       'packages/legacy/core/lib',
       'packages/react-hooks/build/',
       'samples/app/lib/',
+      'samples/opsecid/lib/',
     ],
   },
   {
